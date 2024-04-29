@@ -1,12 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 require('dotenv').config()
-const port=process.env.PORT || 5000;
+const port = process.env.PORT || 5000;
 
- 
+
 
 // Middleware
 app.use(cors());
@@ -15,7 +15,7 @@ app.use(express.json());
 
 
 
- 
+
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.pflyccd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -34,17 +34,36 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     app.post('/addSpot', async (req, res) => {
-        const spot = req.body;
-        const result = await client.db("ArabVoyage").collection("users").insertOne(spot);
-        console.log(result);
-        res.send(result);
+      const spot = req.body;
+      const result = await client.db("ArabVoyage").collection("users").insertOne(spot);
+      console.log(result);
+      res.send(result);
     });
-    const spotCollection=client.db("ArabVoyage").collection("users")
+    const spotCollection = client.db("ArabVoyage").collection("users")
     app.get('/spots', async (req, res) => {
-        const cursor = spotCollection.find();
-        const result = await cursor.toArray();
-        res.send(result);
+      const cursor = spotCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
     });
+
+    //My List
+    app.get('/myList/:email', async (req, res) => {
+      console.log(req.params.id);
+      const result = await spotCollection.find({ email: req.params.email }).toArray();
+      res.send(result);
+
+    })
+
+    app.get('/singleSpot/:id', async (req, res) => {
+      console.log(req.params.id);
+      const result = await spotCollection.findOne({ _id: new ObjectId(req.params.id) });
+      res.send(result);
+
+    })
+    app.put('/updateSpot/:id', async (req, res) => {
+      console.log(req.params.id);
+    })
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -56,9 +75,9 @@ async function run() {
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-    res.send('ArabVoyage is running');
+  res.send('ArabVoyage is running');
 
 });
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 })

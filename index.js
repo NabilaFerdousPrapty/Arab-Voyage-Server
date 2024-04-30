@@ -6,14 +6,13 @@ const app = express();
 require('dotenv').config()
 const port = process.env.PORT || 5000;
 const corsOptions = {
-  origin: 'http://localhost:5173', // Allow requests from this origin
-  
+  origin: 'https://arabvoyage-4a1a4.web.app', // Allow requests from this origin
+  origin: 'http://localhost:5173', 
 };
 app.use(cors(corsOptions));
 
 
 // Middleware
-
 app.use(express.json());
 
 
@@ -43,13 +42,14 @@ async function run() {
       console.log(result);
       res.send(result);
     });
-    const spotCollection = client.db("ArabVoyage").collection("users")
+    const spotCollection = client.db("ArabVoyage").collection("users");
+    const countryCollection = client.db("ArabVoyage").collection("Countries");
     app.get('/spots', async (req, res) => {
       const cursor = spotCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
-
+    
     //My List
     app.get('/myList/:email', async (req, res) => {
       console.log(req.params.id);
@@ -57,7 +57,11 @@ async function run() {
       res.send(result);
 
     })
-
+    app.get('/touristSpots/:country_Name',async (req, res) => {
+      console.log(req.params.country_Name);
+      const result = await spotCollection.find({ countryName: req.params.country_Name }).toArray();
+      res.send(result);
+    })
     app.get('/singleSpot/:id', async (req, res) => {
       console.log(req.params.id);
       const result = await spotCollection.findOne({ _id: new ObjectId(req.params.id) });
@@ -86,6 +90,11 @@ async function run() {
       console.log(result);
       res.send(result)
 
+    })
+    app.get('/countries', async (req, res) => {
+      const cursor = countryCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
     })
 app.delete('/deleteSpot/:id', async (req, res) => {
   console.log(req.params.id);

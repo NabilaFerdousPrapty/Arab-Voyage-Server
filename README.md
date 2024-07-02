@@ -1,6 +1,4 @@
-Here's the `README.md` file in markdown format:
 
-```markdown
 # ArabVoyage Server
 
 ArabVoyage is a web application designed to help users find and explore tourist spots around the world. This server-side application is built using Node.js, Express, and MongoDB.
